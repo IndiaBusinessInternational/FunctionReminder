@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#070b0f">
+    <meta name="description" content="Scan function invitation cards and set timely reminders with IBI Function Reminder.">
+    <title>IBI Function Reminder</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="branding">
+          <span class="version-pill" id="appVersion">v2</span>
+          <span class="brand-mark" aria-hidden="true">IBI</span>
+          <div>
+            <p class="brand-name">Function Reminder</p>
+            <p class="brand-tagline">Invitation to alarm, beautifully organized</p>
+          </div>
+        </div>
+        <button class="ghost-button install-button" id="installButton" type="button" hidden>Install app</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero panel" aria-labelledby="pageTitle">
+        <div>
+          <p class="eyebrow">Smart function planner</p>
+          <h1 id="pageTitle">IBI Function Reminder</h1>
+          <p class="hero-copy">Scan or upload an invitation card, extract details with local OCR or your preferred AI provider, save the card copy, and never miss a wedding or celebration.</p>
+        </div>
+        <div class="next-reminder" id="nextReminder">
+          <p class="caption">Next alert</p>
+          <strong>No scheduled alerts</strong>
+          <span>Add an invitation to begin.</span>
+        </div>
+      </section>
+
+      <div class="dashboard">
+        <section class="panel import-panel" aria-labelledby="scanHeading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 1</p>
+              <h2 id="scanHeading">Scan an invitation card</h2>
+            </div>
+            <span class="privacy-tag">AI + local scan</span>
+          </div>
+          <p class="section-copy">Photograph a printed card or upload its image. Local OCR stays in this browser; AI extraction sends the card to the provider you choose.</p>
+
+          <div class="upload-actions">
+            <label class="action-button primary" for="cameraInput">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 4 7.2 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.2L15 4H9Zm3 4.2a4.8 4.8 0 1 1 0 9.6 4.8 4.8 0 0 1 0-9.6Zm0 2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z"/></svg>
+              Scan card
+              <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+            </label>
+            <label class="action-button secondary" for="fileInput">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a1 1 0 0 1 .7.3l4 4a1 1 0 0 1-1.4 1.4L13 6.4V15a1 1 0 1 1-2 0V6.4L8.7 8.7a1 1 0 1 1-1.4-1.4l4-4A1 1 0 0 1 12 3ZM4 14a1 1 0 0 1 1 1v4h14v-4a1 1 0 1 1 2 0v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a1 1 0 0 1 1-1Z"/></svg>
+              Upload photo
+              <input id="fileInput" type="file" accept="image/*" hidden>
+            </label>
+          </div>
+
+          <div class="scan-preview" id="scanPreview" hidden>
+            <img id="invitationPreview" alt="Selected invitation card preview">
+            <div class="scan-status">
+              <p id="fileName">Selected card</p>
+              <button class="text-button" id="extractButton" type="button">Extract details</button>
+              <div class="progress" id="ocrProgress" hidden>
+                <div class="progress-track"><span id="ocrProgressBar"></span></div>
+                <span id="ocrProgressText">Reading card...</span>
+              </div>
+            </div>
+          </div>
+
+          <section class="ai-panel" aria-labelledby="aiHeading">
+            <div class="form-heading">
+              <p class="eyebrow">Smart extraction</p>
+              <h2 id="aiHeading">AI exact extraction</h2>
+            </div>
+            <p class="assistive">Choose local OCR or connect your own Gemini, OpenAI or Claude API key. Keys are stored only in this browser when saved.</p>
+            <div class="field-row">
+              <label>
+                Extraction engine
+                <select id="aiProvider">
+                  <option value="local">Local OCR</option>
+                  <option value="gemini">Gemini API</option>
+                  <option value="openai">OpenAI API</option>
+                  <option value="claude">Claude API</option>
+                </select>
+              </label>
+              <label>
+                Model
+                <input id="aiModel" type="text" placeholder="Model name">
+              </label>
+            </div>
+            <label>
+              API key
+              <input id="aiApiKey" type="password" autocomplete="off" placeholder="Paste your own API key">
+            </label>
+            <div class="form-actions">
+              <button class="ghost-button small" id="saveAiSettingsButton" type="button">Save AI settings</button>
+              <button class="ghost-button small" id="clearAiKeyButton" type="button">Clear API key</button>
+            </div>
+            <p class="caveat" id="aiSecurityNote">For public GitHub hosting, never hard-code API keys into files. Use your own key here, or use a secure server proxy for production.</p>
+          </section>
+
+          <form class="event-form" id="eventForm">
+            <div class="form-heading">
+              <p class="eyebrow">Step 2</p>
+              <h2>Confirm function details</h2>
+            </div>
+            <p class="assistive">Correct any details before scheduling your reminders.</p>
+            <label>
+              Function name
+              <input id="eventName" name="eventName" type="text" placeholder="Example: Priya & Rahul Wedding Reception" required>
+            </label>
+            <div class="field-row">
+              <label>
+                Date
+                <input id="eventDate" name="eventDate" type="date" required>
+              </label>
+              <label>
+                Start time
+                <input id="eventTime" name="eventTime" type="time" required>
+              </label>
+            </div>
+            <label>
+              Venue
+              <input id="eventVenue" name="eventVenue" type="text" placeholder="Function hall or address">
+            </label>
+            <label>
+              Notes
+              <textarea id="eventNotes" name="eventNotes" rows="3" placeholder="Host contact, dress code or landmark"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="action-button primary" id="saveEventButton" type="submit">Save &amp; set reminders</button>
+              <button class="ghost-button" id="resetFormButton" type="button">Clear form</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="side-column">
+          <section class="panel controls" aria-labelledby="controlsHeading">
+            <p class="eyebrow">Alerts</p>
+            <h2 id="controlsHeading">Alarm controls</h2>
+            <label class="toggle-row" for="alarmsToggle">
+              <span>
+                <strong>Reminders active</strong>
+                <small>Check due alerts while the app is open</small>
+              </span>
+              <span class="switch">
+                <input id="alarmsToggle" type="checkbox" role="switch" checked>
+                <span aria-hidden="true"></span>
+              </span>
+            </label>
+            <label class="toggle-row" for="soundToggle">
+              <span>
+                <strong>Loud alarm sound</strong>
+                <small>Play alarm sound and vibrate where available</small>
+              </span>
+              <span class="switch">
+                <input id="soundToggle" type="checkbox" role="switch" checked>
+                <span aria-hidden="true"></span>
+              </span>
+            </label>
+            <div class="notification-row">
+              <div>
+                <strong>Device notifications</strong>
+                <small id="notificationStatus">Permission not requested</small>
+              </div>
+              <button class="ghost-button small" id="notificationsButton" type="button">Enable</button>
+            </div>
+            <div class="schedule-box">
+              <strong>Every function receives 3 alerts</strong>
+              <p>1 day before at 7:00 AM</p>
+              <p>On the day at 7:00 AM</p>
+              <p>1 hour before start time</p>
+            </div>
+            <button class="ghost-button full alarm-test" id="testAlarmButton" type="button">Test loud alarm</button>
+            <button class="action-button secondary full" id="calendarAllButton" type="button" disabled>Download phone alarm calendar</button>
+            <p class="caveat">Browser audio cannot ring from a fully closed tab. For audible alerts when the app is closed, import this calendar file into the phone calendar/alarm system.</p>
+          </section>
+        </aside>
+      </div>
+
+      <section class="panel events-panel" aria-labelledby="functionsHeading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Functions</p>
+            <h2 id="functionsHeading">Saved functions</h2>
+          </div>
+          <span class="counter" id="eventCount">0 functions</span>
+        </div>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon" aria-hidden="true">07</div>
+          <h3>No saved functions yet</h3>
+          <p>Upload an invitation card above or enter the details manually.</p>
+        </div>
+        <div class="event-list" id="eventList"></div>
+      </section>
+
+      <section class="panel attendance" aria-labelledby="attendanceHeading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">History</p>
+            <h2 id="attendanceHeading">Function last attended</h2>
+          </div>
+        </div>
+        <div class="last-attended" id="lastAttended">
+          <strong>No attended function recorded</strong>
+          <span>Use "Mark attended" on a saved function to keep a record here.</span>
+        </div>
+        <div class="clear-area">
+          <label class="toggle-row danger" for="clearAllToggle">
+            <span>
+              <strong>Clear all saved data</strong>
+              <small>Erase functions, reminders and attended history manually</small>
+            </span>
+            <span class="switch">
+              <input id="clearAllToggle" type="checkbox" role="switch">
+              <span aria-hidden="true"></span>
+            </span>
+          </label>
+          <div class="confirm-clear" id="clearConfirmation" hidden>
+            <p>This cannot be undone. Erase all locally saved details?</p>
+            <button class="danger-button" id="confirmClearButton" type="button">Erase all</button>
+            <button class="ghost-button small" id="cancelClearButton" type="button">Cancel</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="alarm-modal" id="alarmModal" role="dialog" aria-modal="true" aria-labelledby="alarmTitle" hidden>
+      <div class="alarm-card">
+        <p class="alarm-label">Function reminder</p>
+        <h2 id="alarmTitle">It is time</h2>
+        <p id="alarmMessage"></p>
+        <div class="alarm-actions">
+          <button class="action-button primary" id="dismissAlarmButton" type="button">Dismiss alarm</button>
+          <button class="ghost-button" id="snoozeAlarmButton" type="button">Snooze 10 minutes</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-modal" id="cardModal" role="dialog" aria-modal="true" aria-labelledby="cardModalTitle" hidden>
+      <div class="card-viewer">
+        <div class="card-viewer-head">
+          <div>
+            <p class="alarm-label">Saved invitation</p>
+            <h2 id="cardModalTitle">Scanned card</h2>
+          </div>
+          <button class="ghost-button small" id="closeCardButton" type="button">Close</button>
+        </div>
+        <img id="storedCardImage" alt="Saved scanned invitation card">
+        <div class="alarm-actions">
+          <button class="action-button secondary" id="downloadCardButton" type="button">Download scanned copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <template id="eventTemplate">
+      <article class="event-card">
+        <div class="event-date">
+          <strong data-field="day"></strong>
+          <span data-field="month"></span>
+        </div>
+        <div class="event-detail">
+          <div class="event-title-row">
+            <h3 data-field="name"></h3>
+            <span class="attended-badge" hidden>Attended</span>
+          </div>
+          <p class="event-meta" data-field="meta"></p>
+          <p class="event-venue" data-field="venue"></p>
+          <div class="stored-card" data-field="cardBlock" hidden>
+            <img data-field="cardThumb" alt="Saved invitation card preview">
+            <button class="text-button" data-action="viewCard" type="button">View scanned card</button>
+          </div>
+          <div class="reminder-tags" data-field="reminders"></div>
+          <div class="event-actions">
+            <label class="mini-toggle">
+              <input data-action="attend" type="checkbox">
+              <span>Mark attended</span>
+            </label>
+            <button class="text-button" data-action="calendar" type="button">Calendar</button>
+            <button class="text-button remove" data-action="delete" type="button">Delete</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
